@@ -6,6 +6,7 @@
 
 #include "myChart.h"
 #define ID_DTIMER 222
+#define ID_ATIMER 333
 #include <math.h>
 
 #define MAX_LOADSTRING 100
@@ -101,14 +102,15 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 
 int cnt;
+easyChart cht1;
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    easyChart cht1;
     switch (message)
     {
     case WM_CREATE:
         cnt = 0;
         SetTimer(hWnd, ID_DTIMER, 15, (TIMERPROC)NULL);
+        SetTimer(hWnd, ID_ATIMER, 300, (TIMERPROC)NULL);
         break;
     case WM_COMMAND:
         {
@@ -133,8 +135,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         switch (wmId)
         {
         case ID_DTIMER:
-            
             cht1.reDraw(hWnd);
+            break;
+        case ID_ATIMER:
+            HDC tmpdc = GetDC(hWnd);
+            char tmpstr[255];
+            wsprintf((LPWSTR)tmpstr, L"numdata: %d", cht1.getnumdata());
+            TextOut(tmpdc, 150, 10, (LPCWSTR)tmpstr, lstrlen((LPCWSTR)tmpstr));
+            wsprintf((LPWSTR)tmpstr, L"cnt    : %d", cnt++);
+            TextOut(tmpdc, 150, 30, (LPCWSTR)tmpstr, lstrlen((LPCWSTR)tmpstr));
+            //TextOut(tmpdc, 150, 50, cht1.getdatasStr(), 255 * sizeof(LPWSTR));
+            /*wsprintf((LPWSTR)tmpstr, L"%s", cht1.getdatasStr());
+            TextOut(tmpdc, 150, 50, (LPCWSTR)tmpstr, lstrlen((LPCWSTR)tmpstr));*/
+            ReleaseDC(hWnd, tmpdc);
+
+            cht1.appendData(220 + rand() % 10);
             break;
         }
     }
